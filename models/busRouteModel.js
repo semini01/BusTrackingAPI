@@ -21,6 +21,14 @@ const BusRouteSchema = new Schema(
       type: [String], // Array of stop names
       default: [],
     },
+    duration: {
+      type: String,
+      required: false, // Use required, not allowNull
+    },
+    distance: {
+      type: String,
+      required: false,
+    },
   },
   { timestamps: true }
 );
