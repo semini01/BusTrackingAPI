@@ -51,3 +51,64 @@ export const getBusById = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+
+// Get bus by registration number
+export const getBusByRegNo = async (req, res) => {
+  try {
+    const { busRegNo } = req.params;
+
+    const bus = await BusModel.findOne({ busRegNo })
+      .populate("route")
+      .populate("user");
+    if (!bus) {
+      return res
+        .status(404)
+        .json({ message: "Bus not found with this registration number" });
+    }
+    res.json(bus);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+// Update bus by registration number
+export const updateBusByRegNo = async (req, res) => {
+  try {
+    const { busRegNo } = req.params;
+    const updateData = req.body;
+
+    const updatedBus = await BusModel.findOneAndUpdate(
+      { busRegNo },
+      updateData,
+      { new: true, runValidators: true }
+    )
+      .populate("route")
+      .populate("user");
+
+    if (!updatedBus) {
+      return res
+        .status(404)
+        .json({ message: "Bus not found with this registration number" });
+    }
+    res.json(updatedBus);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+// Delete bus by registration number
+export const deleteBusByRegNo = async (req, res) => {
+  try {
+    const { busRegNo } = req.params;
+
+    const deletedBus = await BusModel.findOneAndDelete({ busRegNo });
+    if (!deletedBus) {
+      return res
+        .status(404)
+        .json({ message: "Bus not found with this registration number" });
+    }
+    res.json({ message: "Bus deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
