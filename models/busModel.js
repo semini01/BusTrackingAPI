@@ -13,14 +13,13 @@ const BusSchema = new Schema(
       required: true,
       unique: true,
     },
+    driverName: {
+      type: String,
+      required: true,
+    },
     route: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "BusRouteModel", // Reference to BusRoute schema
-      required: true,
-    },
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "UsersModel", // Reference to User schema
       required: true,
     },
   },

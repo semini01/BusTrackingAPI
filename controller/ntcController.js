@@ -43,7 +43,7 @@ export const getAllBusRoutes = async (req, res) => {
 // Get bus route by start and endpoints
 export const getBusRouteByPoints = async (req, res) => {
   try {
-    const { startPoint, endPoint } = req.query;
+    const { startPoint, endPoint } = req.query; // or req.params if path params
 
     if (!startPoint || !endPoint) {
       return res
@@ -51,11 +51,7 @@ export const getBusRouteByPoints = async (req, res) => {
         .json({ message: "startPoint and endPoint are required" });
     }
 
-    const routes = await BusRouteModel.find({
-      startPoint: { $regex: `^${startPoint}$`, $options: "i" },
-      endPoint: { $regex: `^${endPoint}$`, $options: "i" },
-    });
-
+    const routes = await BusRouteModel.find({ startPoint, endPoint });
     if (!routes.length) {
       return res
         .status(404)
@@ -71,14 +67,11 @@ export const getBusRouteByPoints = async (req, res) => {
 // Update bus route
 export const updateBusRouteByPoints = async (req, res) => {
   try {
-    const { startPoint, endPoint } = req.params;
+    const { startPoint, endPoint } = req.params; // or req.query if you prefer
     const updateData = req.body;
 
     const updatedRoute = await BusRouteModel.findOneAndUpdate(
-      {
-        startPoint: { $regex: `^${startPoint}$`, $options: "i" },
-        endPoint: { $regex: `^${endPoint}$`, $options: "i" },
-      },
+      { startPoint, endPoint },
       updateData,
       { new: true, runValidators: true }
     );
@@ -100,8 +93,8 @@ export const deleteBusRouteByPoints = async (req, res) => {
     const { startPoint, endPoint } = req.params;
 
     const deletedRoute = await BusRouteModel.findOneAndDelete({
-      startPoint: { $regex: `^${startPoint}$`, $options: "i" },
-      endPoint: { $regex: `^${endPoint}$`, $options: "i" },
+      startPoint,
+      endPoint,
     });
 
     if (!deletedRoute) {
