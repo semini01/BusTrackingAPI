@@ -52,6 +52,39 @@ export const getBusById = async (req, res) => {
   }
 };
 
+// Update bus by ID
+export const updateBusById = async (req, res) => {
+  try {
+    const updatedBus = await BusModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    )
+      .populate("route")
+      .populate("user");
+
+    if (!updatedBus) {
+      return res.status(404).json({ message: "Bus not found" });
+    }
+    res.json(updatedBus);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+// Delete bus by ID
+export const deleteBusById = async (req, res) => {
+  try {
+    const deletedBus = await BusModel.findByIdAndDelete(req.params.id);
+    if (!deletedBus) {
+      return res.status(404).json({ message: "Bus not found" });
+    }
+    res.json({ message: "Bus deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
 // Get bus by registration number
 export const getBusByRegNo = async (req, res) => {
   try {

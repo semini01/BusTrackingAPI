@@ -5,9 +5,9 @@ import {
   getBusRouteByPoints,
   updateBusRouteByPoints,
   deleteBusRouteByPoints,
-} from "../controllers/ntcController.js";
+} from "../controller/ntcController.js";
 
-import authMiddleware from "../utils/authMiddleware.js"; // Adjust path as needed
+import { authMiddleware } from "../utils/authMiddleware.js";
 
 const router = express.Router();
 

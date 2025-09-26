@@ -2,6 +2,8 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import authRoutes from "./routes/authRoutes.js";
+import ntcRoutes from "./routes/ntcRoutes.js";
+import operatorRoutes from "./routes/operatorRoutes.js";
 
 // Load env vars from .env file
 dotenv.config();
@@ -13,6 +15,8 @@ app.use(express.json());
 
 // routes here
 app.use("/api/auth", authRoutes);
+app.use("/api/ntc", ntcRoutes);
+app.use("/api/operator", operatorRoutes);
 
 const mongoURI = process.env.MONGODB_URI;
 mongoose
