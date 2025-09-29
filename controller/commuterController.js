@@ -1,5 +1,5 @@
 import LocationModel from "../models/locationModel.js";
-
+import BusRouteModel from "../models/busRouteModel.js";
 import BusModel from "../models/busModel.js";
 
 export const saveLocation = async (req, res) => {
@@ -22,18 +22,37 @@ export const saveLocation = async (req, res) => {
   }
 };
 
-/**
- * Search buses on a given route
- */
 export const searchBusesByRoute = async (req, res) => {
   try {
-    const { route } = req.query;
+    const { startPoint, endPoint } = req.params;
 
-    // Find buses matching the route (assumes BusModel has a 'route' field)
-    const buses = await BusModel.find({ route });
+    if (!startPoint || !endPoint) {
+      return res
+        .status(400)
+        .json({ message: "Start and end points are required" });
+    }
+
+    // 1️⃣ Find route(s) matching start & end points
+    const routes = await BusRouteModel.find({
+      startPoint: { $regex: startPoint, $options: "i" },
+      endPoint: { $regex: endPoint, $options: "i" },
+    });
+
+    if (!routes.length) {
+      return res
+        .status(404)
+        .json({ message: "No routes found for this start and end point" });
+    }
+
+    const routeIds = routes.map((route) => route._id);
+
+    // 2️⃣ Find buses with these route IDs and populate route
+    const buses = await BusModel.find({ route: { $in: routeIds } })
+      .populate("route") // populate the route field
+      .populate("user"); // optional: if you want user info
 
     if (!buses.length) {
-      return res.status(404).json({ message: "No buses found on this route" });
+      return res.status(404).json({ message: "No buses found for this route" });
     }
 
     res.status(200).json(buses);
