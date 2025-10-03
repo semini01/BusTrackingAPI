@@ -209,3 +209,32 @@ export const deleteAllTrips = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getTripsByBus = async (req, res, next) => {
+  try {
+    const { busId } = req.params;
+    const trips = await TripModel.find({ bus: busId }).sort({ date: -1 });
+    res.status(200).json(trips);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get all trips scheduled for today
+ */
+export const getTodayTrips = async (req, res, next) => {
+  try {
+    const today = new Date();
+    const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+
+    const trips = await TripModel.find({
+      startTime: { $gte: startOfDay, $lte: endOfDay },
+    }).populate("bus");
+
+    res.status(200).json(trips);
+  } catch (error) {
+    next(error);
+  }
+};
