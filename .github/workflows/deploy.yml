@@ -1,0 +1,27 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - prod # deploy only when pushing to prod branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/${{ secrets.EC2_USER }}/myapp || mkdir -p /home/${{ secrets.EC2_USER }}/myapp && cd /home/${{ secrets.EC2_USER }}/myapp
+            git pull origin prod || git clone -b prod https://github.com/semini01/BusTrackingAPI.git .
+
+            npm install
+            pm2 restart all || pm2 start index.js --name "BusTrackingAPI"
