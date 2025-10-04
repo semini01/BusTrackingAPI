@@ -3,7 +3,7 @@ name: Deploy to EC2
 on:
   push:
     branches:
-      - prod # deploy only when pushing to prod branch
+      - prod # runs when you push to prod branch
 
 jobs:
   deploy:
@@ -16,13 +16,39 @@ jobs:
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
+          host: ${{ secrets.EC2_HOST }} # 13.62.127.164
+          username: ${{ secrets.EC2_USER }} # ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }} # your .pem contents
           script: |
-            cd /home/${{ secrets.EC2_USER }}/myapp || mkdir -p /home/${{ secrets.EC2_USER }}/myapp && cd /home/${{ secrets.EC2_USER }}/myapp
-            git pull origin prod || git clone -b prod https://github.com/semini01/BusTrackingAPI.git .
+            # Go to app folder (create if missing)
+            mkdir -p /home/${{ secrets.EC2_USER }}/myapp
+            cd /home/${{ secrets.EC2_USER }}/myapp
 
+            # Install required packages if not available
+            if ! command -v git &> /dev/null; then
+              sudo yum update -y
+              sudo yum install -y git
+            fi
+
+            if ! command -v node &> /dev/null; then
+              curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
+              sudo yum install -y nodejs
+            fi
+
+            if ! command -v pm2 &> /dev/null; then
+              sudo npm install -g pm2
+            fi
+
+            # Clone repo if not exists, else pull latest
+            if [ -d .git ]; then
+              git reset --hard
+              git pull origin prod
+            else
+              git clone -b prod https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/semini01/BusTrackingAPI.git .
+            fi
+
+            # Install dependencies
             npm install
-            pm2 restart all || pm2 start index.js --name "BusTrackingAPI"
 
+            # Restart app with PM2
+            pm2 restart all || pm2 start index.js --name "BusTrackingAPI"
