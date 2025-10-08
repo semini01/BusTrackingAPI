@@ -30,12 +30,12 @@ mongoose
   .connect(mongoURI)
   .then(() => {
     console.log("MongoDB connected successfully");
-    app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
-      console.log(`Swagger UI available at http://localhost:${PORT}/api-docs`);
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log('Server running on http://0.0.0.0:${PORT}');
+      console.log('Swagger UI available at http://0.0.0.0:${PORT}/api-docs');
     });
   })
   .catch((error) => {
     console.error("MongoDB connection error:", error);
     process.exit(1);
-  });
+  });
