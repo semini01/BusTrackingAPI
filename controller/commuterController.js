@@ -121,3 +121,50 @@ export const getCurrentTripLocation = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// Bulk insert locations with only busId, latitude, longitude, and timestamp
+export const saveBulkLocations = async (req, res) => {
+  try {
+    const locations = req.body; // Expecting an array of objects
+
+    if (!Array.isArray(locations) || locations.length === 0) {
+      return res
+        .status(400)
+        .json({ error: "Request body must be a non-empty array" });
+    }
+
+    // Validate and prepare data
+    const validLocations = locations.map((loc) => {
+      const { busId, latitude, longitude, timestamp } = loc;
+
+      if (
+        !busId ||
+        latitude === undefined ||
+        longitude === undefined ||
+        !timestamp
+      ) {
+        throw new Error(
+          "Each location must include busId, latitude, longitude, and timestamp"
+        );
+      }
+
+      return {
+        busId,
+        latitude,
+        longitude,
+        updatedAt: new Date(timestamp),
+      };
+    });
+
+    // Insert many
+    const inserted = await LocationModel.insertMany(validLocations);
+
+    res.status(201).json({
+      message: `${inserted.length} locations inserted successfully`,
+      data: inserted,
+    });
+  } catch (error) {
+    console.error("Error inserting bulk locations:", error);
+    res.status(500).json({ error: error.message });
+  }
+};

@@ -8,12 +8,11 @@ const LocationSchema = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "BusModel",
       required: true,
-      unique: true,
     },
     tripId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "TripModel", // link to your trip
-      required: true,
+      required: false,
     },
     latitude: {
       type: Number,
@@ -25,7 +24,7 @@ const LocationSchema = new Schema(
     },
     locationName: {
       type: String,
-      required: true,
+      required: false,
     },
     status: {
       type: String,

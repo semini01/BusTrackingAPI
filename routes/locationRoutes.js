@@ -3,6 +3,7 @@ import {
   saveLocation,
   searchBusesByRoute,
   getCurrentTripLocation,
+  saveBulkLocations,
 } from "../controller/commuterController.js";
 
 const router = express.Router();
@@ -105,5 +106,5 @@ router.get("/searchBusesByRoute/:startPoint/:endPoint", searchBusesByRoute);
  *         description: Server error
  */
 router.get("/location/:busId", getCurrentTripLocation);
-
+router.post("/saveBulks", saveBulkLocations);
 export default router;
